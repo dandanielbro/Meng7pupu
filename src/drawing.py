@@ -1,12 +1,12 @@
 # from mpl_toolkits.mplot3d import Axes3D
-# from matplotlib import cm
 # from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from matplotlib import cm
 import matplotlib.pyplot as plt
-# import numpy as np
 import pandas as pd
-# import statsmodels.api as sm
+import statsmodels.api as sm
+import os
 
-# Global paarmeters
+# Global parmeters
 filename = "raw_data.csv"
 
 # def draw_scatter(x_data, y_data):
@@ -20,43 +20,47 @@ def read_and_format_csv(filename):
 
     return df
 
-def draw_scatter_with_OSL(df_x, df_y):
-    plt.scatter(df_x, df_y, s=30)
-    plt.xlabel(df_x.name)
-    plt.ylabel(df_y.name)
-    plt.show()
+def generate_OLS_model(df_x, df_y):
+    model = sm.OLS(df_y, sm.add_constant(df_x))
+    model_fit = model.fit()
+    p = model_fit.params
+    print(p)
+
+    return p
+
+def draw_scatter_with_OLS(df_x, df_y, df_z):
+    # Generate linear coefficient of OLS
+    para_for_OLS = generate_OLS_model(df_x, df_z)
+
+    # Generate figure
+    fig, ax = plt.subplots()
+
+    # Scatter plot
+    ax.scatter(df_x, df_y, s=20, c="black")
+
+    # Draw OLS on axes
+    ax.plot(df_x, (para_for_OLS[0] + para_for_OLS[1]*df_x), 'r-')
+    
+    ax.set_xlabel(df_x.name)
+    ax.set_ylabel(df_y.name)
 
 def draw_bubble_chart(df_x, df_y, df_z):
-    # Normalize the data to range [0,1]
-    # print(df_z.max())
-    # print(df_z.min())
-    # range_diff = df_z.max() - df_z.min()
-    # min = df_z.min()
-    # df_z = (df_z-min)/range_diff
-    # print(df_z*100)
-    # print(df_z.max())
-    # print(df_z.min())
+    # Create a continuous norm to map from data points to colors
+    norm = plt.Normalize(df_z.min(), df_z.max())
 
-    plt.scatter(df_x, df_y, s=(df_z+200), alpha=0.6)
-    plt.xlabel(df_x.name)
-    plt.ylabel(df_y.name)
-    plt.show()
+    fig, ax = plt.subplots()
 
-def draw_surface_plot(df_x, df_y, df_z):
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    mappable = ax.scatter(df_x, df_y, c=df_z, cmap="bwr", norm=norm, alpha=0.5)
+    ax.set_xlabel(df_x.name)
+    ax.set_ylabel(df_y.name)
+    fig.colorbar(mappable, ax=ax)
 
-    ax.bar(df_x, df_y, df_z, zdir='y')
-
-    plt.xlabel(df_x.name)
-    plt.ylabel(df_y.name)
-
-    plt.show()
 
 if __name__ == "__main__":
     df_raw = read_and_format_csv(filename)
     array_columns = df_raw.columns
-    # draw_scatter_with_OSL(df_x=df_raw[array_columns[1]], df_y=df_raw[array_columns[0]])
+    print(array_columns)
+    draw_scatter_with_OLS(df_x=df_raw[array_columns[0]], df_y=df_raw[array_columns[1]], df_z=df_raw[array_columns[2]])
     draw_bubble_chart(df_x=df_raw[array_columns[0]], df_y=df_raw[array_columns[1]], df_z=df_raw[array_columns[2]])
-    # draw_surface_plot(df_x=df_raw[array_columns[0]], df_y=df_raw[array_columns[1]], df_z=df_raw[array_columns[2]])
-    # print(df_raw)
+
+    plt.show()
