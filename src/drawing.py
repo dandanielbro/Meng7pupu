@@ -76,7 +76,9 @@ def draw_scatter_with_OLS(df_x, df_y, unit_x=None, unit_y=None):
     ax.scatter(df_x, df_y, s=20, c="black", label="Original Data")
 
     # Draw OLS on axes
-    ax.plot(df_x, (para_for_OLS[0] + para_for_OLS[1]*df_x), 'r-',
+    x_limit = (para_for_OLS[0]/para_for_OLS[1])*(-1)    # Get the x-value which leads to zero y-value
+    df_drop_x = df_x[df_x >= x_limit]
+    ax.plot(df_drop_x, (para_for_OLS[0] + para_for_OLS[1]*df_drop_x), 'r-',
             label=f"y = {format(para_for_OLS[1], '.3f')}*x + ({format(para_for_OLS[0], '.3f')})")
     
     # Put the label on each axis
@@ -104,7 +106,7 @@ def draw_bubble_chart(df_x, df_y, df_z, unit_x=None, unit_y=None, unit_z=None):
     for i in range(0, df_x.shape[0]):
         z = df_z.iloc[i]
         if(z >= data_to_show):
-            ax.annotate(str(z), (df_x.iloc[i], df_y.iloc[i]))
+            ax.annotate(str(round(z,2)), (df_x.iloc[i], df_y.iloc[i]))
 
     # Put the label on each axis
     if unit_x is not None:
