@@ -1,12 +1,27 @@
+import matplotlib
+matplotlib.rcParams['mathtext.fontset'] = 'cm'
+# matplotlib.rc('font', family='serif', serif='CMU Serif')
 import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 
 # Global parmeters
 filename = "raw_data.csv"
+
 upper_limit_of_normal_data = 200    # Will drop data greater than upper_limit in function-"drop_outlier"
 lower_limit_of_normal_data = 0      # Will drop data less than lower_limit in function-"drop_outlier"
 data_to_show = 50                   # Only annotate the data greater than or equal to "data_to_show" on bubble chart
+
+title_x_axis = "Sonic Temperature"
+title_y_axis = "Shortwave Radiation"
+title_z_axis = "Carbon Dioxide Flux"
+
+unit_x_axis = r'$^oC$'
+unit_y_axis = r'$W/m^2$'
+unit_z_axis = r'$\mu mol m^{-2} s^{-1}$'
+
+title_chart_A = ""
+title_chart_B = "Optimum Temperature for Tea Leaf Growth"
 
 def read_and_format_csv(filename):
     try:
@@ -55,13 +70,17 @@ def format_and_get_unit(df):
     units = units.astype('str')
 
     return df, units
-    
+
+def log_out(filename, message):
+    with open(filename, 'w') as f:
+        print(message, file=f)
 
 def generate_OLS_model(df_x, df_y):
     model = sm.OLS(df_y, sm.add_constant(df_x))
     model_fit = model.fit()
     p = model_fit.params
     print(f"Equation of OSL: y = {p[1]}*x + ({p[0]})")
+    log_out("Summary_of_OSL.txt", model_fit.summary())
 
     return p
 
@@ -81,16 +100,12 @@ def draw_scatter_with_OLS(df_x, df_y, unit_x=None, unit_y=None):
     ax.plot(df_drop_x, (para_for_OLS[0] + para_for_OLS[1]*df_drop_x), 'r-',
             label=f"y = {format(para_for_OLS[1], '.3f')}*x + ({format(para_for_OLS[0], '.3f')})")
     
-    # Put the label on each axis
-    if unit_x is not None:
-        ax.set_xlabel(df_x.name + f"  ({unit_x.item()})")
-    else:
-        ax.set_xlabel(df_x)
+    # Put the title
+    ax.set_title(title_chart_A)
 
-    if unit_y is not None:
-        ax.set_ylabel(df_y.name + f"  ({unit_y.item()})")
-    else:
-        ax.set_ylabel(df_y)
+    # Put the label on each axis
+    ax.set_xlabel(f"{title_x_axis} ({unit_x_axis})")
+    ax.set_ylabel(f"{title_y_axis} ({unit_y_axis})")
 
     # Put the legend on the chart
     ax.legend()
@@ -102,22 +117,18 @@ def draw_bubble_chart(df_x, df_y, df_z, unit_x=None, unit_y=None, unit_z=None):
 
     fig, ax = plt.subplots()
 
-    ax.scatter(df_x, df_y, s=df_z_norm*1000, alpha=0.5, label=f"{df_z.name}  ({unit_z.item()})")
+    ax.scatter(df_x, df_y, s=df_z_norm*1000, alpha=0.5, label=f"{title_z_axis} ({unit_z_axis})")
     for i in range(0, df_x.shape[0]):
         z = df_z.iloc[i]
         if(z >= data_to_show):
             ax.annotate(str(round(z,2)), (df_x.iloc[i], df_y.iloc[i]))
 
+    # Put the title
+    ax.set_title(title_chart_B)
+    
     # Put the label on each axis
-    if unit_x is not None:
-        ax.set_xlabel(df_x.name + f"  ({unit_x.item()})")
-    else:
-        ax.set_xlabel(df_x)
-
-    if unit_y is not None:
-        ax.set_ylabel(df_y.name + f"  ({unit_y.item()})")
-    else:
-        ax.set_ylabel(df_y)
+    ax.set_xlabel(f"{title_x_axis} ({unit_x_axis})")
+    ax.set_ylabel(f"{title_y_axis} ({unit_y_axis})")
 
     # Put the legend on the chart
     ax.legend()
