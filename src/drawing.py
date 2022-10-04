@@ -84,7 +84,7 @@ def generate_OLS_model(df_x, df_y):
 
     return p
 
-def draw_scatter_with_OLS(df_x, df_y, unit_x=None, unit_y=None):
+def draw_scatter_with_OLS(df_x, df_y):
     # Generate linear coefficient of OLS
     para_for_OLS = generate_OLS_model(df_x, df_y)
 
@@ -110,7 +110,7 @@ def draw_scatter_with_OLS(df_x, df_y, unit_x=None, unit_y=None):
     # Put the legend on the chart
     ax.legend()
 
-def draw_bubble_chart(df_x, df_y, df_z, unit_x=None, unit_y=None, unit_z=None):
+def draw_bubble_chart(df_x, df_y, df_z):
     # Normalize the df_z to [0, 1]
     diff = df_z.max() - df_z.min()
     df_z_norm = (df_z-df_z.min())/diff + 0.001
@@ -144,13 +144,13 @@ if __name__ == "__main__":
     array_columns = df_formatted.columns
 
     # Drawing the scatter plot and the OLS line
-    draw_scatter_with_OLS(df_x=df_formatted[array_columns[0]], unit_x=units[array_columns[0]],
-                          df_y=df_formatted[array_columns[1]], unit_y=units[array_columns[1]])
+    draw_scatter_with_OLS(df_x=df_formatted[array_columns[0]],
+                          df_y=df_formatted[array_columns[1]])
 
     # Dropping(Hidding) the outlier data and draw the bubble chart
     df_no_outlier = drop_outlier(df_formatted)
-    draw_bubble_chart(df_x=df_no_outlier[array_columns[0]], unit_x=units[array_columns[0]],
-                      df_y=df_no_outlier[array_columns[1]], unit_y=units[array_columns[1]],
-                      df_z=df_no_outlier[array_columns[2]], unit_z=units[array_columns[2]])
+    draw_bubble_chart(df_x=df_no_outlier[array_columns[0]],
+                      df_y=df_no_outlier[array_columns[1]],
+                      df_z=df_no_outlier[array_columns[2]])
 
     plt.show()
