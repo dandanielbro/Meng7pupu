@@ -1,0 +1,9 @@
+{
+    "python.poetryPath": "poetry",
+    "code-runner.executorMap":{
+        "python": "set PYTHONIOENCODING=utf-8 && $pythonPath $fullFileName"
+    },
+    "code-runner.clearPreviousOutput": false,
+    "code-runner.saveFileBeforeRun": true,
+    "code-runner.runInTerminal": true,
+}

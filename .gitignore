@@ -4,6 +4,12 @@ test.py
 src/raw_data.csv
 Summary_of_OSL.txt
 
+# vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,vim,venv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,vim,venv
