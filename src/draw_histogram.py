@@ -6,7 +6,7 @@ import numpy as np
 
 # Global parameters
 _filename = "example_data/gwp_histogram.csv"
-_title = "Global Warming Potential contrast with CH4 and CO2"
+_title = "Global Warming Potential(100) contrast with CH4 and CO2"
 
 # Configuration
 plt.rcParams['font.sans-serif'] = ['Times New Roman']
@@ -16,30 +16,30 @@ def draw_histogram(df=pd.DataFrame()):
     fig, ax = plt.subplots()
 
     # Generate m_xticks
-    step = 5
+    step = 1
     m_xticks = df.iloc[:,0][::step]
-    print(m_xticks)
+    # print(m_xticks)
 
     # Draw histogram
     ax.bar(x=df.iloc[:,0],
            height=df.iloc[:,1],
-           label="CO2")
+           label="CO2(µmol_s-1_m-2)")
     ax.bar(x=df.iloc[:,0],
            height=df.iloc[:,2],
-           label="CH4",)
+           label="CH4(µmol_s-1_m-2)",)
     ax.legend()
     ax.grid(linestyle=':')
     ax.set_xticks(ticks = np.arange(0, (len(df.iloc[:,0])), step),
                   labels = m_xticks,
                   rotation = 90)
-    ax.set_title(_title)
+    ax.set_title(_title, fontname='Times New Roman')
 
     return None
 
 def revise_dataframe(df=pd.DataFrame()):
     # Replace NaN with 0
     df.fillna(0, inplace=True)
-    
+
     return df
 
 if __name__ == "__main__":
@@ -48,10 +48,10 @@ if __name__ == "__main__":
 
     # Revise the data
     df_revised = revise_dataframe(df)
-    print(df_revised)
+    # print(df_revised)
 
     # Draw the histogram
     draw_histogram(df_revised)
-    
+
     plt.tight_layout()
     plt.show()
