@@ -1,11 +1,13 @@
 # draw_bubble.py
 
 import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize
+from matplotlib import cm
 import pandas as pd
 import numpy as np
 
 # Global parameters
-_filename = "raw_bubble.csv"
+_filename = "example_data/raw_bubble.csv"
 _title = "Optimum Temperature for Tea Leaf Growth"
 
 # Configuration
@@ -25,11 +27,11 @@ unit_z_axis = r'$\mu mol m^{-2} s^{-1}$'
 
 def read_and_format_csv(filename):
     try:
-        # Read csv file and ust 'tab' as delimiter
+        # Read csv file and use 'tab' as delimiter
         df = pd.read_csv(filename, delimiter=',')
 
         # If the file is not seperated by common raise exception and use common as delimiter
-        if(df.shape[1] != 4):
+        if(df.shape[1] != 3):
             raise Exception("Input file is not seperated by ','")
 
     except Exception:
@@ -39,7 +41,7 @@ def read_and_format_csv(filename):
         df = pd.read_csv(filename, delimiter='\t')
 
     # Drop the time columns
-    df.drop(df.columns[0], axis=1, inplace=True)
+    # df.drop(df.columns[0], axis=1, inplace=True)
 
     return df
 
@@ -57,28 +59,20 @@ def drop_outlier(df):
 
     return df
 
-def format_and_get_unit(df):
-    # take out the unit from the df
-    units = df.iloc[[0]]
-    
-    # Drop the unit from the df
-    df.drop(index=0, axis=1, inplace=True)
-    
+def format(df):
     # Transform the type of df into float64,
-    # type of units into string
     df = df.astype('float64')
-    units = units.astype('str')
 
-    return df, units
+    return df
 
 def draw_bubble_chart(df_x, df_y, df_z):
     # Normalize the df_z to [0, 1]
-    diff = df_z.max() - df_z.min()
-    df_z_norm = (df_z-df_z.min())/diff + 0.001
+    # diff = df_z.max() - df_z.min()
+    # df_z_norm = (df_z-df_z.min())/diff + 0.001
 
     fig, ax = plt.subplots()
 
-    ax.scatter(df_x, df_y, s=df_z_norm*1000, alpha=0.5, label=f"{title_z_axis} ({unit_z_axis})")
+    ax.scatter(df_x, df_y, s=50, c=df_z, cmap="viridis", alpha=0.8, label=f"{title_z_axis} ({unit_z_axis})")
     for i in range(0, df_x.shape[0]):
         z = df_z.iloc[i]
         if(z >= data_to_show):
@@ -91,22 +85,22 @@ def draw_bubble_chart(df_x, df_y, df_z):
     ax.set_xlabel(f"{title_x_axis} ({unit_x_axis})")
     ax.set_ylabel(f"{title_y_axis} ({unit_y_axis})")
 
+    # Put the colorbar on the chart
+    norm = Normalize(vmin=df_z.min(), vmax=df_z.max())
+    fig.colorbar(cm.ScalarMappable(norm=norm, cmap="viridis"), ax=ax)
+
     # Put the legend on the chart
     ax.legend()
 
 if __name__ == "__main__":
     # Read the csv file into a dataframe and drop the time columns
-    df_raw = read_and_format_csv(filename)
+    df_raw = read_and_format_csv(_filename)
 
     # Format the df_raw & take out the units
-    df_formatted, units = format_and_get_unit(df_raw)
+    df_formatted = format(df_raw)
 
     # Store the names of the columns for calling
     array_columns = df_formatted.columns
-
-    # Drawing the scatter plot and the OLS line
-    draw_scatter_with_OLS(df_x=df_formatted[array_columns[0]],
-                          df_y=df_formatted[array_columns[1]])
 
     # Dropping(Hidding) the outlier data and draw the bubble chart
     df_no_outlier = drop_outlier(df_formatted)
