@@ -38,19 +38,11 @@ def read_and_format_csv(filename):
 
     return df
 
-def format_and_get_unit(df):
-    # take out the unit from the df
-    units = df.iloc[[0]]
-    
-    # Drop the unit from the df
-    df.drop(index=0, axis=1, inplace=True)
-    
+def format(df):
     # Transform the type of df into float64,
-    # type of units into string
     df = df.astype('float64')
-    units = units.astype('str')
 
-    return df, units
+    return df
 
 def log_out(filename, message):
     with open(filename, 'w') as f:
@@ -96,7 +88,7 @@ if __name__ == "__main__":
     df_raw = read_and_format_csv(_filename)
 
     # Format the df_raw & take out the units
-    df_formatted, units = format_and_get_unit(df_raw)
+    df_formatted = format(df_raw)
 
     # Store the names of the columns for calling
     array_columns = df_formatted.columns
